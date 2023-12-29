@@ -1,0 +1,44 @@
+CREATE TABLE first_measurement_date AS
+  WITH FirstMeasurements AS (
+    SELECT
+    BP1.user_id,
+      MIN(BP1.bp_date::date) as first_measurement_date
+      FROM BP1
+        INNER JOIN Users ON BP1.user_id = Users.id
+          WHERE BP1.bp_date::date >= '2015-01-01'
+          AND BP1.bp_date::date >= Users.reg_date::date
+      GROUP BY BP1.user_id
+    ),
+  MeasurementsExcludingFirst AS (
+    SELECT
+        BP1.user_id,
+        BP1.systolic,
+        BP1.diastolic,
+        BP1.bp_date::date as bp_date,
+        F.first_measurement_date
+      FROM BP1
+          INNER JOIN FirstMeasurements F ON BP1.user_id = F.user_id
+          INNER JOIN Users ON BP1.user_id = Users.id
+            WHERE BP1.bp_date::date > F.first_measurement_date
+            AND BP1.bp_date::date >= '2015-01-01'
+            AND BP1.bp_date::date >= Users.reg_date::date
+  ),
+  WeeklyMeasurements AS (
+    SELECT
+      user_id,
+      systolic,
+      diastolic,
+      bp_date,
+      first_measurement_date,
+        FLOOR((bp_date - first_measurement_date) / 7) as week_since_first
+          FROM MeasurementsExcludingFirst
+  )
+    SELECT
+      user_id,
+        COUNT(*) as number_of_measurements,
+          AVG(systolic) as avg_systolic,
+          AVG(diastolic) as avg_diastolic,
+            week_since_first
+          FROM WeeklyMeasurements
+    GROUP BY user_id, week_since_first
+    ORDER BY user_id, week_since_first;
