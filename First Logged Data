@@ -1,0 +1,21 @@
+CREATE TABLE first_action_date AS
+  SELECT
+    u.Id as user_id,
+      MIN(
+      LEAST(
+        COALESCE(NULLIF(bp.bp_date::date, u.reg_date::date), '9999-12-31'),
+        COALESCE(NULLIF(bs.bs_date::date, u.reg_date::date), '9999-12-31'),
+        COALESCE(NULLIF(we.weight_date::date, u.reg_date::date), '9999-12-31')
+    )
+  ) as date_first_measure
+  FROM
+    users u
+      LEFT JOIN BP1 bp ON u.Id = bp.user_id AND bp.bp_date::date >= u.reg_date::date AND bp.bp_date::date >= '2015-01-01'
+      LEFT JOIN BS1 bs ON u.Id = bs.user_id AND bs.bs_date::date >= u.reg_date::date AND bs.bs_date::date >= '2015-01-01'
+      LEFT JOIN WE1 we ON u.Id = we.user_id AND we.weight_date::date >= u.reg_date::date AND we.weight_date::date >= '2015-01-01'
+  WHERE
+    u.Company NOT IN ('educainc', 'hardworkinginc')
+  GROUP BY
+    u.Id
+  ORDER BY
+    u.Id;
