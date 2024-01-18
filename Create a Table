@@ -22,7 +22,7 @@ ALTER TABLE friends
 ADD COLUMN email TEXT;
 
 UPDATE friends
-SET email = 'storm@codeacademy.com'
+SET email = 'storm@email.com'
 WHERE id = 1;
 
 DELETE FROM friends
