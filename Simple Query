@@ -1,0 +1,15 @@
+Compose an SQL query that computes the average appointment duration for each patient based on their last five appointments. The Appointments table includes a "Duration" column that represents the appointment duration in minutes.
+
+SELECT
+    PatientID,
+    AppointmentDate,
+    Duration,
+    AVG(Duration) OVER (
+        PARTITION BY PatientID 
+        ORDER BY AppointmentDate 
+        ROWS BETWEEN 4 PRECEDING AND CURRENT ROW
+    ) AS RollingAvgDuration
+FROM 
+    Appointments
+ORDER BY 
+    PatientID, AppointmentDate;
