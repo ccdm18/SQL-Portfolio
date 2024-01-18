@@ -1,0 +1,1 @@
+Craft an SQL query to fetch the names and appointment dates of patients from the "Patients" table, specifically those who have had an appointment within the past 30 days. The "Patients" table includes columns such as "PatientID," "Name," and "LastAppointmentDate," while the "Appointments" table includes columns like "AppointmentID," "PatientID," and "AppointmentDate."
